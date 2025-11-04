@@ -1,0 +1,33 @@
+name: Run Snowflake Pipeline
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  run_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install SnowSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-linux_x86_64.tar.gz
+          tar -xvzf snowsql-linux_x86_64.tar.gz
+          ./snowsql-linux_x86_64/install
+
+      - name: Run Snowflake SQL script
+        run: |
+          ./snowsql -a ${{ secrets.SNOWSQL_ACCOUNT }} \
+                    -u ${{ secrets.SNOWSQL_USER }} \
+                    -p ${{ secrets.SNOWSQL_PASSWORD }} \
+                    -r ${{ secrets.SNOWSQL_ROLE }} \
+                    -d ${{ secrets.SNOWSQL_DATABASE }} \
+                    -s ${{ secrets.SNOWSQL_SCHEMA }} \
+                    -w ${{ secrets.SNOWSQL_WAREHOUSE }} \
+                    -f scripts/load_data.sql

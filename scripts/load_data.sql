@@ -1,3 +1,8 @@
+CREATE OR REPLACE FILE FORMAT my_csv_format
+  TYPE = 'CSV'
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+  SKIP_HEADER = 1;
+
 COPY INTO sample_sales
 FROM @~/sample_sales_data.csv
 FILE_FORMAT = (FORMAT_NAME = my_csv_format)

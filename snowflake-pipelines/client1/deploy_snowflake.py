@@ -4,16 +4,25 @@ from pathlib import Path
 
 print("🚀 Starting Snowflake deployment...")
 
-# Connect to Snowflake
+# ✅ Fetch Snowflake credentials from environment
+database = os.getenv("SNOWFLAKE_DATABASE")
+schema = os.getenv("SNOWFLAKE_SCHEMA")
+
+# ✅ Connect to Snowflake
 conn = snowflake.connector.connect(
     user=os.getenv("SNOWFLAKE_USER"),
     password=os.getenv("SNOWFLAKE_PASSWORD"),
     account=os.getenv("SNOWFLAKE_ACCOUNT"),
     warehouse=os.getenv("SNOWFLAKE_WAREHOUSE"),
-    database=os.getenv("SNOWFLAKE_DATABASE"),
-    schema=os.getenv("SNOWFLAKE_SCHEMA")
+    database=database,
+    schema=schema
 )
 cursor = conn.cursor()
+
+# ✅ Set session context explicitly
+print(f"🔧 Setting context: DATABASE={database}, SCHEMA={schema}")
+cursor.execute(f"USE DATABASE {database}")
+cursor.execute(f"USE SCHEMA {schema}")
 
 base_path = Path("snowflake-pipelines/client1")
 folders = ["tables", "stages", "file_formats", "streams", "pipes", "tasks"]
@@ -28,19 +37,21 @@ for folder in folders:
                     print(f"➡ Deploying: {sql_file}")
                     try:
                         with open(sql_file, "r") as f:
-                            sql = f.read()
+                            sql = f.read().strip()
+                        # ✅ Ensure SQL runs in correct context
+                        cursor.execute(f"USE DATABASE {database}")
+                        cursor.execute(f"USE SCHEMA {schema}")
                         cursor.execute(sql)
                         print(f"✅ Deployed: {sql_file}")
                         # ✅ Refresh pipe after creation
                         if folder == "pipes":
                             pipe_name = sql_file.stem
-                            schema_name = schema_folder.name
-                            refresh_query = f"ALTER PIPE {schema_name}.{pipe_name} REFRESH"
+                            refresh_query = f"ALTER PIPE {database}.{schema}.{pipe_name} REFRESH"
                             try:
                                 cursor.execute(refresh_query)
-                                print(f"🔄 Pipe refreshed: {schema_name}.{pipe_name}")
+                                print(f"🔄 Pipe refreshed: {pipe_name}")
                             except Exception as e:
-                                print(f"⚠️ Pipe refresh failed: {schema_name}.{pipe_name} - {e}")
+                                print(f"⚠️ Pipe refresh failed: {pipe_name} - {e}")
                     except Exception as e:
                         print(f"❌ Deployment failed: {sql_file} - {e}")
 
@@ -48,7 +59,7 @@ for folder in folders:
 data_path = Path("data")
 if data_path.exists():
     for csv_file in data_path.glob("*.csv"):
-        stage_name = "PUBLIC.MY_STAGE"  # Replace with your actual stage name
+        stage_name = f"{database}.{schema}.MY_STAGE"  # ✅ Fully qualified stage name
         put_command = f"PUT file://{csv_file.resolve()} @{stage_name}"
         print(f"📤 Uploading: {csv_file.name} to @{stage_name}")
         try:

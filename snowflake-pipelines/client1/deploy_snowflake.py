@@ -60,7 +60,7 @@ data_path = Path("data")
 if data_path.exists():
     for csv_file in data_path.glob("*.csv"):
         stage_name = f"{database}.{schema}.MY_STAGE"  # ✅ Fully qualified stage name
-        put_command = f"PUT file://{csv_file.resolve()} @{stage_name}"
+        put_command = f"PUT file://{csv_file.resolve()} @{stage_name} AUTO_COMPRESS = FALSE"
         print(f"📤 Uploading: {csv_file.name} to @{stage_name}")
         try:
             cursor.execute(put_command)

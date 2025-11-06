@@ -67,7 +67,7 @@ if data_path.exists():
             print(f"✅ Uploaded: {csv_file.name}")
             # ✅ Trigger ingestion for uploaded file
             staged_file = f"{csv_file.name}.gz"  # Snowflake auto-compresses unless disabled
-            refresh_query = f"ALTER PIPE {database}.{schema}.SAMPLE_SALES_PIPE REFRESH FILES = ('{staged_file}')"
+            refresh_query = f"ALTER PIPE {database}.{schema}.SAMPLE_SALES_PIPE REFRESH"
             cursor.execute(refresh_query)
             print(f"🔄 Ingestion triggered for {staged_file}")
         except Exception as e:

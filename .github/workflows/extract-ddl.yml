@@ -2,8 +2,12 @@ name: Extract Snowflake DDLs
 
 on:
   workflow_dispatch:  # Manual trigger
-  schedule:
-    - cron: '0 2 * * *'  # Optional: run daily at 2 AM UTC
+  # Optional: Uncomment to run daily
+  # schedule:
+  #   - cron: '0 2 * * *'
+
+permissions:
+  contents: write  # ✅ Required for pushing changes
 
 jobs:
   extract-ddl:
@@ -28,12 +32,16 @@ jobs:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-        run: python extract_ddl.py
+        run: |
+          echo "🔍 Running extract_ddl.py..."
+          python extract_ddl.py
 
       - name: Commit and Push Changes
         run: |
-          git config --global user.name "abhigit-design"
-          git config --global user.email "asomani2612@gmail.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add .
-          git commit -m "Update DDL files from Snowflake"
+          git commit -m "Update DDL files from Snowflake" || echo "No changes to commit"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

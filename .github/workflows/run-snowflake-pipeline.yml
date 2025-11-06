@@ -1,4 +1,4 @@
-name: Run Snowflake Pipeline
+name: Run test Snowflake Pipeline
 
 on:
   schedule:

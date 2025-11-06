@@ -1,5 +1,5 @@
-product	quantity	order_date
-Costco	3	10/16/2025
-Mouse	5	10/12/2025
-Keyboard	4	10/23/2025
-Piano	4	10/23/2025
+product,quantity,order_date
+Costco,3,10/16/2025
+Mouse,5,10/12/2025
+Keyboard,4,10/23/2025
+Piano,4,10/23/2025

@@ -71,7 +71,7 @@ if data_path.exists():
             copy_query = f"""
             COPY INTO {database}.{schema}.sample_sales
             FROM @{stage_name}
-            FILE_FORMAT = (TYPE = 'CSV' FIELD_DELIMITER=' ' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1);
+            FILE_FORMAT = (TYPE = 'CSV' FIELD_DELIMITER=',' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1);
             """
             print(f"🔄 Running manual COPY INTO for {csv_file.name}...")
             cursor.execute(copy_query)

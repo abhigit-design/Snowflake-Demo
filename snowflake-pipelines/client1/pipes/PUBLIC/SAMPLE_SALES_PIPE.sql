@@ -1,0 +1,3 @@
+create or replace pipe SAMPLE_SALES_PIPE auto_ingest=false as COPY INTO sample_sales
+FROM @MY_STAGE
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1);

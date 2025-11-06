@@ -52,6 +52,18 @@ for folder in folders:
                                 print(f"🔄 Pipe refreshed: {pipe_name}")
                             except Exception as e:
                                 print(f"⚠️ Pipe refresh failed: {pipe_name} - {e}")
+                    
+                        
+                        if folder == "tasks":
+                                    task_name = sql_file.stem
+                                    resume_query = f"ALTER TASK {database}.{schema}.{task_name} RESUME"
+                                    try:
+                                        cursor.execute(resume_query)
+                                        print(f"▶️ Task resumed: {task_name}")
+                                    except Exception as e:
+                                        print(f"⚠️ Task resume failed: {task_name} - {e}")
+
+                    
                     except Exception as e:
                         print(f"❌ Deployment failed: {sql_file} - {e}")
 

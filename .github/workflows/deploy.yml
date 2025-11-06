@@ -35,6 +35,7 @@ jobs:
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_STAGE: SAMPLE_STAGE
         run: |
           echo "🔧 Starting Snowflake deployment..."
           python snowflake-pipelines/client1/deploy_snowflake.py

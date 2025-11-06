@@ -4,9 +4,10 @@ from pathlib import Path
 
 print("🚀 Starting Snowflake deployment...")
 
-# ✅ Fetch Snowflake credentials from environment
+# ✅ Fetch Snowflake credentials and stage name from environment
 database = os.getenv("SNOWFLAKE_DATABASE")
 schema = os.getenv("SNOWFLAKE_SCHEMA")
+stage = os.getenv("SNOWFLAKE_STAGE")  # ✅ Dynamic stage name
 
 # ✅ Connect to Snowflake
 conn = snowflake.connector.connect(
@@ -38,7 +39,6 @@ for folder in folders:
                     try:
                         with open(sql_file, "r") as f:
                             sql = f.read().strip()
-                        # ✅ Ensure SQL runs in correct context
                         cursor.execute(f"USE DATABASE {database}")
                         cursor.execute(f"USE SCHEMA {schema}")
                         cursor.execute(sql)
@@ -59,17 +59,21 @@ for folder in folders:
 data_path = Path("data")
 if data_path.exists():
     for csv_file in data_path.glob("*.csv"):
-        stage_name = f"{database}.{schema}.MY_STAGE"  # ✅ Fully qualified stage name
+        stage_name = f"{database}.{schema}.{stage}"  # ✅ Dynamic stage name
         put_command = f"PUT file://{csv_file.resolve()} @{stage_name} AUTO_COMPRESS = FALSE"
         print(f"📤 Uploading: {csv_file.name} to @{stage_name}")
         try:
             cursor.execute(put_command)
             print(f"✅ Uploaded: {csv_file.name}")
+            # ✅ Trigger ingestion for uploaded file
+            staged_file = f"{csv_file.name}.gz"  # Snowflake auto-compresses unless disabled
+            refresh_query = f"ALTER PIPE {database}.{schema}.SAMPLE_SALES_PIPE REFRESH FILES = ('{staged_file}')"
+            cursor.execute(refresh_query)
+            print(f"🔄 Ingestion triggered for {staged_file}")
         except Exception as e:
-            print(f"❌ Upload failed: {csv_file.name} - {e}")
+            print(f"❌ Upload or ingestion failed: {csv_file.name} - {e}")
 else:
     print("📂 No data/ folder found. Skipping CSV upload.")
 
 cursor.close()
 conn.close()
-print("✅ Deployment complete!")

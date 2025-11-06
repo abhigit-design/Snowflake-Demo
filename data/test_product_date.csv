@@ -1,5 +1,5 @@
-order_id,customer_name,product,quantity,price,order_date
-ORD1007,Astha,Costco,3,485.75,10/16/2025
-ORD1008,Rohit,Mouse,5,473.79,10/12/2025
-ORD1009,Rahul,Keyboard,4,510.85,10/23/2025
-ORD1010,Ram,Piano,4,510.85,10/23/2025
+product	quantity	order_date
+Costco	3	10/16/2025
+Mouse	5	10/12/2025
+Keyboard	4	10/23/2025
+Piano	4	10/23/2025

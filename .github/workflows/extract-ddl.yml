@@ -1,0 +1,39 @@
+name: Extract Snowflake DDLs
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 2 * * *'  # Optional: run daily at 2 AM UTC
+
+jobs:
+  extract-ddl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install snowflake-connector-python
+
+      - name: Run Extract Script
+        env:
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+        run: python extract_ddl.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "abhigit-design"
+          git config --global user.email "asomani2612@gmail.com"
+          git add .
+          git commit -m "Update DDL files from Snowflake"
+          git push

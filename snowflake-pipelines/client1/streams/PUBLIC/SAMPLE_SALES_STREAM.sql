@@ -1,1 +1,0 @@
-create or replace stream SAMPLE_SALES_STREAM on table SAMPLE_SALES append_only = true;

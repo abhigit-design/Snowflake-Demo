@@ -1,1 +1,1 @@
-create or replace stream SAMPLE_SALES_STREAM on table SAMPLE_SALES append_only = true;
+create or replace stream SAMPLE_SALES_STREAM on table "SAMPLE_DB.PUBLIC.SAMPLE_SALES" append_only = true;

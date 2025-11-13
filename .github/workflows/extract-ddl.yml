@@ -1,8 +1,8 @@
 name: Extract Snowflake DDLs
 
 on:
-  schedule:
-    - cron: "0 2 * * *" # Runs daily at 2 AM
+  #schedule:
+  #  - cron: "0 2 * * *" # Runs daily at 2 AM
   workflow_dispatch: # Allow manual trigger
 
 permissions:
